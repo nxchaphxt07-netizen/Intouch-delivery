@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Intouch Delivery - เดลิเวอรีส่งตรงถึงบ้าน</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Kanit', -apple-system, sans-serif; background-color: #000000; }
+    .neon-glow { box-shadow: 0 0 25px rgba(16, 185, 129, 0.3); }
+    .neon-text { text-shadow: 0 0 12px rgba(16, 185, 129, 0.5); }
+  </style>
+</head>
+<body class="bg-black text-gray-100 pb-36">
+
+  <!-- Modal เข้าสู่ระบบเบอร์โทรศัพท์ -->
+  <div id="login-modal" class="fixed inset-0 bg-black/95 backdrop-blur-md z-50 flex items-center justify-center p-4">
+    <div class="bg-zinc-950 border-2 border-emerald-500 w-full max-w-sm rounded-3xl p-6 text-center shadow-2xl neon-glow space-y-5">
+      <div class="w-24 h-24 bg-gradient-to-tr from-emerald-600 to-emerald-400 text-black rounded-full flex items-center justify-center mx-auto shadow-lg relative animate-bounce">
+        <span class="text-5xl">🐷</span>
+        <div class="absolute -bottom-1 bg-black text-emerald-400 border border-emerald-500 text-[10px] font-black px-2.5 py-0.5 rounded-full uppercase">VIP</div>
+      </div>
+      <div>
+        <h2 class="text-xl font-extrabold text-emerald-400 neon-text">INTOUCH DELIVERY</h2>
+        <p class="text-xs text-gray-300 mt-1">กรอกเบอร์โทรศัพท์มือถือเพื่อเริ่มสั่งความอร่อยครับ</p>
+      </div>
+      <div class="space-y-3 text-left">
+        <div>
+          <label class="text-xs font-semibold text-emerald-400 block mb-1.5">เบอร์โทรศัพท์มือถือ *</label>
+          <input id="login-phone" type="tel" placeholder="08X-XXX-XXXX" class="w-full bg-black border-2 border-emerald-500/60 rounded-xl p-3 text-base text-emerald-300 focus:border-emerald-400 outline-none text-center font-bold tracking-wider transition">
+        </div>
+      </div>
+      <button onclick="handleLogin()" class="w-full bg-emerald-500 hover:bg-emerald-400 text-black py-3 rounded-xl font-bold text-base shadow-lg shadow-emerald-500/40 transition active:scale-95">
+        เข้าสู่ระบบ 🛵
+      </button>
+    </div>
+  </div>
+
+  <!-- Header แบรนด์ -->
+  <header class="bg-black/90 backdrop-blur-md border-b-2 border-emerald-500/40 text-white p-3.5 sticky top-0 z-30 shadow-lg flex justify-between items-center">
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 bg-emerald-500 rounded-2xl flex items-center justify-center text-xl shadow-md shadow-emerald-500/50 border border-emerald-300">
+        🐷
+      </div>
+      <div>
+        <h1 class="text-base font-extrabold text-emerald-400 neon-text tracking-wide leading-tight">INTOUCH DELIVERY</h1>
+        <p class="text-[11px] text-gray-400 flex items-center gap-1">
+          <span class="w-2 h-2 rounded-full bg-emerald-500 inline-block animate-pulse"></span>
+          ผู้ใช้: <span id="user-display-phone" class="text-emerald-300 font-medium">-</span>
+        </p>
+      </div>
+    </div>
+    <div class="flex items-center gap-2">
+      <button onclick="promptAdminPassword()" class="bg-zinc-900 hover:bg-zinc-800 border border-emerald-500/40 text-emerald-400 px-3 py-1.5 rounded-full text-xs font-semibold shadow-sm transition flex items-center gap-1">
+        ⚙️ จัดการระบบ (แอดมิน)
+      </button>
+    </div>
+  </header>
+
+  <!-- Banner โซนบริการ -->
+  <div class="bg-gradient-to-r from-emerald-950 via-zinc-900 to-emerald-950 border-b border-emerald-500/40 p-3 px-4 text-xs flex justify-between items-center">
+    <div class="flex items-center gap-2 text-gray-300">
+      <span class="text-2xl animate-spin">🛵</span>
+      <div>
+        <p class="font-bold text-emerald-400">ส่งไว ส่งฟิน ทั่วพื้นที่!</p>
+        <p class="text-gray-300 text-[11px]">บ้านเนินสะอาด / ม.นคร / หนองญาติ</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- แถบสลับร้านค้า -->
+  <div class="flex gap-2 p-3 bg-black border-b border-zinc-900 overflow-x-auto sticky top-[65px] z-20">
+    <button onclick="switchShop('shop1')" id="btn-shop1" class="shop-tab bg-emerald-500 text-black px-4 py-2 rounded-full text-xs font-bold whitespace-nowrap shadow-md transition">
+      🔥 หม่าล่าพี่เรนนี่ (สาขา ม.นคร)
+    </button>
+    <button onclick="switchShop('shop2')" id="btn-shop2" class="shop-tab bg-zinc-900 text-gray-400 border border-zinc-800 px-4 py-2 rounded-full text-xs font-bold whitespace-nowrap transition">
+      🍗 เจ๊อ้อยขาใหญ่
+    </button>
+  </div>
+
+  <!-- Main Content -->
+  <main class="p-4 max-w-md mx-auto space-y-4">
+    
+    <!-- ร้านที่ 1: หม่าล่าพี่เรนนี่ สาขา ม.นคร -->
+    <div id="shop1-section" class="shop-section space-y-4">
+      <div class="bg-zinc-950 border-2 border-emerald-500/40 rounded-3xl p-4 shadow-xl neon-glow space-y-4">
+        <div class="flex items-center justify-between border-b border-zinc-900 pb-3">
+          <div class="flex items-center gap-2.5">
+            <div class="w-10 h-10 bg-emerald-500/20 border border-emerald-500/50 rounded-2xl flex items-center justify-center text-emerald-400 text-lg">🔥</div>
+            <div>
+              <h2 class="text-base font-bold text-white">หม่าล่าพี่เรนนี่ สาขา ม.นคร</h2>
+              <p class="text-[11px] text-emerald-400/80">ชาบูน้ำดำ/หม่าล่า & หม่าล่าทอด</p>
+            </div>
+          </div>
+          <span id="badge-shop1" class="text-[10px] bg-emerald-500 text-black px-2.5 py-0.5 rounded-full font-black">เปิดอยู่</span>
+        </div>
+
+        <div class="space-y-3">
+          <!-- เมนู: หมูสามชั้น -->
+          <div id="card-item1" class="bg-zinc-900/90 border border-emerald-500/30 p-3.5 rounded-2xl space-y-3">
+            <div class="flex justify-between items-center">
+              <div>
+                <h3 class="font-bold text-white text-sm">🐷 หมูสามชั้น <span id="out-item1" class="text-red-400 text-xs hidden font-bold">(สินค้าหมด)</span></h3>
+                <p class="text-xs text-gray-400">เริ่มต้น <span class="text-emerald-400 font-bold">20 ฿</span> (ทอด +2฿)</p>
+              </div>
+            </div>
+            <div class="grid grid-cols-3 gap-1.5 pt-1 text-[11px]">
+              <div class="bg-black border border-emerald-500/30 p-2 rounded-xl text-center space-y-1">
+                <span class="text-gray-300 block font-medium">ทอด (22฿)</span>
+                <div class="flex justify-between items-center bg-zinc-900 px-1 py-1 rounded-lg">
+                  <button onclick="adjustDirectItem('หม่าล่าพี่เรนนี่ สาขา ม.นคร', 'หมูสามชั้น', 20, 'แบบทอด', -1, 'item1')" class="w-5 h-5 bg-zinc-800 text-white rounded-md font-bold">-</button>
+                  <span id="qty_p1_fry" class="font-bold text-emerald-400">0</span>
+                  <button onclick="adjustDirectItem('หม่าล่าพี่เรนนี่ สาขา ม.นคร', 'หมูสามชั้น', 20, 'แบบทอด', 1, 'item1')" class="w-5 h-5 bg-emerald-500 text-black rounded-md font-bold">+</button>
+                </div>
+              </div>
+              <div class="bg-black border border-emerald-500/30 p-2 rounded-xl text-center space-y-1">
+                <span class="text-gray-300 block font-medium">ซุปดำ (20฿)</span>
+                <div class="flex justify-between items-center bg-zinc-900 px-1 py-1 rounded-lg">
+                  <button onclick="adjustDirectItem('หม่าล่าพี่เรนนี่ สาขา ม.นคร', 'หมูสามชั้น', 20, 'ชาบู-น้ำดำ', -1, 'item1')" class="w-5 h-5 bg-zinc-800 text-white rounded-md font-bold">-</button>
+                  <span id="qty_p1_black" class="font-bold text-emerald-400">0</span>
+                  <button onclick="adjustDirectItem('หม่าล่าพี่เรนนี่ สาขา ม.นคร', 'หมูสามชั้น', 20, 'ชาบู-น้ำดำ', 1, 'item1')" class="w-5 h-5 bg-emerald-500 text-black rounded-md font-bold">+</button>
+                </div>
+              </div>
+              <div class="bg-black border border-emerald-500/30 p-2 rounded-xl text-center space-y-1">
+                <span class="text-gray-300 block font-medium">ซุปหม่าล่า (20฿)</span>
+                <div class="flex justify-between items-center bg-zinc-900 px-1 py-1 rounded-lg">
+                  <button onclick="adjustDirectItem('หม่าล่าพี่เรนนี่ สาขา ม.นคร', 'หมูสามชั้น', 20, 'ชาบู-น้ำหม่าล่า', -1, 'item1')" class="w-5 h-5 bg-zinc-800 text-white rounded-md font-bold">-</button>
+                  <span id="qty_p1_mala" class="font-bold text-emerald-400">0</span>
+                  <button onclick="adjustDirectItem('หม่าล่าพี่เรนนี่ สาขา ม.นคร', 'หมูสามชั้น', 20, 'ชาบู-น้ำหม่าล่า', 1, 'item1')" class="w-5 h-5 bg-emerald-500 text-black rounded-md font-bold">+</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- เมนู: ปลาดอลลี่ -->
+          <div id="card-item2" class="bg-zinc-900/90 border border-emerald-500/30 p-3.5 rounded-2xl space-y-3">
+            <div class="flex justify-between items-center">
+              <div>
+                <h3 class="font-bold text-white text-sm">🐟 ปลาดอลลี่ <span id="out-item2" class="text-red-400 text-xs hidden font-bold">(สินค้าหมด)</span></h3>
+                <p class="text-xs text-gray-400">เริ่มต้น <span class="text-emerald-400 font-bold">20 ฿</span> (ทอด +2฿)</p>
+              </div>
+            </div>
+            <div class="grid grid-cols-3 gap-1.5 pt-1 text-[11px]">
+              <div class="bg-black border border-emerald-500/30 p-2 rounded-xl text-center space-y-1">
+                <span class="text-gray-300 block font-medium">ทอด (22฿)</span>
+                <div class="flex justify-between items-center bg-zinc-900 px-1 py-1 rounded-lg">
+                  <button onclick="adjustDirectItem('หม่าล่าพี่เรนนี่ สาขา ม.นคร', 'ปลาดอลลี่', 20, 'แบบทอด', -1, 'item2')" class="w-5 h-5 bg-zinc-800 text-white rounded-md font-bold">-</button>
+                  <span id="qty_p2_fry" class="font-bold text-emerald-400">0</span>
+                  <button onclick="adjustDirectItem('หม่าล่าพี่เรนนี่ สาขา ม.นคร', 'ปลาดอลลี่', 20, 'แบบทอด', 1, 'item2')" class="w-5 h-5 bg-emerald-500 text-black rounded-md font-bold">+</button>
+                </div>
+              </div>
+              <div class="bg-black border border-emerald-500/30 p-2 rounded-xl text-center space-y-1">
+                <span class="text-gray-300 block font-medium">ซุปดำ (20฿)</span>
+                <div class="flex justify-between items-center bg-zinc-900 px-1 py-1 rounded-lg">
+                  <button onclick="adjustDirectItem('หม่าล่าพี่เรนนี่ สาขา ม.นคร', 'ปลาดอลลี่', 20, 'ชาบู-น้ำดำ', -1, 'item2')" class="w-5 h-5 bg-zinc-800 text-white rounded-md font-bold">-</button>
+                  <span id="qty_p2_black" class="font-bold text-emerald-400">0</span>
+                  <button onclick="adjustDirectItem('หม่าล่าพี่เรนนี่ สาขา ม.นคร', 'ปลาดอลลี่', 20, 'ชาบู-น้ำดำ', 1, 'item2')" class="w-5 h-5 bg-emerald-500 text-black rounded-md font-bold">+</button>
+                </div>
+              </div>
+              <div class="bg-black border border-emerald-500/30 p-2 rounded-xl text-center space-y-1">
+                <span class="text-gray-300 block font-medium">ซุปหม่าล่า (20฿)</span>
+                <div class="flex justify-between items-center bg-zinc-900 px-1 py-1 rounded-lg">
+                  <button onclick="adjustDirectItem('หม่าล่าพี่เรนนี่ สาขา ม.นคร', 'ปลาดอลลี่', 20, 'ชาบู-น้ำหม่าล่า', -1, 'item2')" class="w-5 h-5 bg-zinc-800 text-white rounded-md font-bold">-</button>
+                  <span id="qty_p2_mala" class="font-bold text-emerald-400">0</span>
+                  <button onclick="adjustDirectItem('หม่าล่าพี่เรนนี่ สาขา ม.นคร', 'ปลาดอลลี่', 20, 'ชาบู-น้ำหม่าล่า', 1, 'item2')" class="w-5 h-5 bg-emerald-500 text-black rounded-md font-bold">+</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- เมนู: เต้าหู้ชีส -->
+          <div id="card-item3" class="bg-zinc-900/90 border border-emerald-500/30 p-3.5 rounded-2xl space-y-3">
+            <div class="flex justify-between items-center">
+              <div>
+                <h3 class="font-bold text-white text-sm">🧀 เต้าหู้ชีส <span id="out-item3" class="text-red-400 text-xs hidden font-bold">(สินค้าหมด)</span></h3>
+                <p class="text-xs text-gray-400">เริ่มต้น <span class="text-emerald-400 font-bold">10 ฿</span> (ทอด +2฿)</p>
+              </div>
+            </div>
+            <div class="grid grid-cols-3 gap-1.5 pt-1 text-[11px]">
+              <div class="bg-black border border-emerald-500/30 p-2 rounded-xl text-center space-y-1">
+                <span class="text-gray-300 block font-medium">ทอด (12฿)</span>
+                <div class="flex justify-between items-center bg-zinc-900 px-1 py-1 rounded-lg">
+                  <button onclick="adjustDirectItem('หม่าล่าพี่เรนนี่ สาขา ม.นคร', 'เต้าหู้ชีส', 10, 'แบบทอด', -1, 'item3')" class="w-5 h-5 bg-zinc-800 text-white rounded-md font-bold">-</button>
+                  <span id="qty_p3_fry" class="font-bold text-emerald-400">0</span>
+                  <button onclick="adjustDirectItem('หม่าล่าพี่เรนนี่ สาขา ม.นคร', 'เต้าหู้ชีส', 10, 'แบบทอด', 1, 'item3')" class="w-5 h-5 bg-emerald-500 text-black rounded-md font-bold">+</button>
+                </div>
+              </div>
+              <div class="bg-black border border-emerald-500/30 p-2 rounded-xl text-center space-y-1">
+                <span class="text-gray-300 block font-medium">ซุปดำ (10฿)</span>
+                <div class="flex justify-between items-center bg-zinc-900 px-1 py-1 rounded-lg">
+                  <button onclick="adjustDirectItem('หม่าล่าพี่เรนนี่ สาขา ม.นคร', 'เต้าหู้ชีส', 10, 'ชาบู-น้ำดำ', -1, 'item3')" class="w-5 h-5 bg-zinc-800 text-white rounded-md font-bold">-</button>
+                  <span id="qty_p3_black" class="font-bold text-emerald-400">0</span>
+                  <button onclick="adjustDirectItem('หม่าล่าพี่เรนนี่ สาขา ม.นคร', 'เต้าหู้ชีส', 10, 'ชาบู-น้ำดำ', 1, 'item3')" class="w-5 h-5 bg-emerald-500 text-black rounded-md font-bold">+</button>
+                </div>
+              </div>
+              <div class="bg-black border border-emerald-500/30 p-2 rounded-xl text-center space-y-1">
+                <span class="text-gray-300 block font-medium">ซุปหม่าล่า (10฿)</span>
+                <div class="flex justify-between items-center bg-zinc-900 px-1 py-1 rounded-lg">
+                  <button onclick="adjustDirectItem('หม่าล่าพี่เรนนี่ สาขา ม.นคร', 'เต้าหู้ชีส', 10, 'ชาบู-น้ำหม่าล่า', -1, 'item3')" class="w-5 h-5 bg-zinc-800 text-white rounded-md font-bold">-</button>
+                  <span id="qty_p3_mala" class="font-bold text-emerald-400">0</span>
+                  <button onclick="adjustDirectItem('หม่าล่าพี่เรนนี่ สาขา ม.นคร', 'เต้าหู้ชีส', 10, 'ชาบู-น้ำหม่าล่า', 1, 'item3')" class="w-5 h-5 bg-emerald-500 text-black rounded-md font-bold">+</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ร้านที่ 2: เจ๊อ้อยขาใหญ่ -->
+    <div id="shop2-section" class="shop-section hidden space-y-4">
+      <div class="bg-zinc-950 border-2 border-emerald-500/40 rounded-3xl p-4 shadow-xl neon-glow space-y-4">
+        <div class="flex items-center justify-between border-b border-zinc-900 pb-3">
+          <div class="flex items-center gap-2.5">
+            <div class="w-10 h-10 bg-amber-500/20 border border-amber-500/50 rounded-2xl flex items-center justify-center text-amber-400 text-lg">🍗</div>
+            <div>
+              <h2 class="text-base font-bold text-white">ร้านเจ๊อ้อยขาใหญ่</h2>
+              <p class="text-[11px] text-amber-400/80">เมนูเด็ดประจำโซน อิ่มอร่อยจุใจ</p>
+            </div>
+          </div>
+          <span id="badge-shop2" class="text-[10px] bg-emerald-500 text-black px-2.5 py-0.5 rounded-full font-black">เปิดอยู่</span>
+        </div>
+
+        <div class="space-y-3">
+          <!-- เมนู: หงส์ 250 บาท -->
+          <div id="card-item4" class="bg-zinc-900/90 border border-emerald-500/30 p-3.5 rounded-2xl flex justify-between items-center">
+            <div>
+              <h3 class="font-bold text-white text-sm">🍾 หงส์ <span id="out-item4" class="text-red-400 text-xs hidden font-bold">(สินค้าหมด)</span></h3>
+              <p class="text-xs text-gray-400">ราคา <span class="text-emerald-400 font-bold">250 ฿</span></p>
+            </div>
+            <div class="flex items-center gap-2 bg-black px-2 py-1 rounded-xl border border-emerald-500/30">
+              <button onclick="adjustDirectItem('ร้านเจ๊อ้อยขาใหญ่', 'หงส์', 250, 'ปกติ', -1, 'item4')" class="w-6 h-6 bg-zinc-800 text-white rounded-md font-bold text-xs">-</button>
+              <span id="qty_p4_normal" class="font-bold text-emerald-400 text-sm">0</span>
+              <button onclick="adjustDirectItem('ร้านเจ๊อ้อยขาใหญ่', 'หงส์', 250, 'ปกติ', 1, 'item4')" class="w-6 h-6 bg-emerald-500 text-black rounded-md font-bold text-xs">+</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- แถบสรุปตะกร้าด้านล่าง -->
+  <div id="bottom-bar" class="hidden fixed bottom-4 left-4 right-4 max-w-md mx-auto z-30">
+    <div class="bg-zinc-950 border-2 border-emerald-500 p-4 rounded-2xl shadow-2xl neon-glow flex justify-between items-center backdrop-blur-md">
+      <div>
+        <p class="text-[11px] text-gray-400">ตะกร้าของคุณ (<span id="cart-count" class="text-emerald-400 font-bold">0</span> รายการ)</p>
+        <p id="total-price" class="text-lg font-black text-emerald-400 neon-text">0 ฿</p>
+      </div>
+      <button onclick="openCart()" class="bg-emerald-500 hover:bg-emerald-400 text-black px-5 py-2.5 rounded-xl text-xs font-extrabold shadow-lg shadow-emerald-500/40 transition active:scale-95 flex items-center gap-1.5">
+        ดูตะกร้าสั่งซื้อ 🛒
+      </button>
+    </div>
+  </div>
+
+  <!-- Modal ตะกร้าสินค้า -->
+  <div id="cart-modal" class="hidden fixed inset-0 bg-black/90 backdrop-blur-sm z-50 flex justify-end">
+    <div class="bg-zinc-950 border-l border-emerald-500/40 w-full max-w-md h-full flex flex-col justify-between p-5 overflow-y-auto text-gray-100 shadow-2xl">
+      <div>
+        <div class="flex justify-between items-center border-b border-zinc-900 pb-4 mb-4">
+          <h2 class="text-base font-bold text-emerald-400 flex items-center gap-2">🛒 สรุปรายการสั่งซื้อ</h2>
+          <button onclick="closeCart()" class="text-gray-400 hover:text-white text-lg font-bold w-8 h-8 rounded-full bg-zinc-900 flex items-center justify-center">✕</button>
+        </div>
+        
+        <div id="cart-items" class="space-y-3 mb-5 border-b border-zinc-900 pb-4"></div>
+        
+        <!-- ข้อมูลจัดส่ง -->
+        <div class="space-y-3.5 mb-5">
+          <h3 class="font-bold text-xs text-emerald-400 uppercase tracking-wider">📍 ข้อมูลจัดส่ง</h3>
+          
+          <div>
+            <label class="text-xs text-gray-300 block mb-1">เบอร์โทรศัพท์มือถือ</label>
+            <input id="cust-phone" type="tel" readonly class="w-full bg-black border border-emerald-500/30 rounded-xl p-2.5 text-xs text-emerald-400 font-bold outline-none cursor-not-allowed">
+          </div>
+
+          <div>
+            <label class="text-xs text-gray-300 block mb-1">พื้นที่โซนจัดส่ง *</label>
+            <select id="shipping-zone" onchange="updateCartUI()" class="w-full bg-black border border-emerald-500/40 rounded-xl p-2.5 text-xs text-white font-semibold outline-none focus:border-emerald-400">
+              <option value="12|โซนบ้านเนินสะอาด / ม.นคร">🏡 โซนบ้านเนินสะอาด / ม.นคร (+12 บาท)</option>
+              <option value="20|โซนหนองญาติ">🛵 โซนหนองญาติ (+20 บาท)</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="text-xs text-gray-300 block mb-1">ชื่อ-นามสกุล ผู้รับ *</label>
+            <input id="cust-name" type="text" placeholder="กรอกชื่อผู้รับ" class="w-full bg-black border border-emerald-500/30 rounded-xl p-2.5 text-xs text-white focus:border-emerald-400 outline-none">
+          </div>
+
+          <div>
+            <label class="text-xs text-gray-300 block mb-1">ที่อยู่จัดส่งโดยละเอียด *</label>
+            <textarea id="cust-address" rows="2" placeholder="ระบุบ้านเลขที่ / ชื่อหอพัก / เลขห้อง" class="w-full bg-black border border-emerald-500/30 rounded-xl p-2.5 text-xs text-white focus:border-emerald-400 outline-none"></textarea>
+          </div>
+
+          <div>
+            <label class="text-xs text-gray-300 block mb-1">หมายเหตุถึงร้านค้า (ถ้ามี)</label>
+            <input id="note-text" type="text" placeholder="เช่น เผ็ดน้อย, วางไว้หน้าห้อง" class="w-full bg-black border border-emerald-500/30 rounded-xl p-2.5 text-xs text-white focus:border-emerald-400 outline-none">
+          </div>
+        </div>
+
+        <!-- วิธีชำระเงิน -->
+        <div class="space-y-2.5 mb-4 border-t border-zinc-900 pt-4">
+          <h3 class="font-bold text-xs text-emerald-400 uppercase tracking-wider">💳 ช่องทางชำระเงิน</h3>
+          <div class="space-y-2">
+            <label class="flex items-center gap-2.5 border border-emerald-500/30 bg-black p-3 rounded-xl cursor-pointer">
+              <input type="radio" name="payment" value="โอนเงินผ่านบัญชีธนาคาร" checked onclick="toggleBank(true)" class="accent-emerald-500">
+              <span class="text-xs font-medium">โอนเงินผ่านบัญชีธนาคาร</span>
+            </label>
+            
+            <div id="bank-section" class="bg-black border border-emerald-500/40 p-3 rounded-xl text-center space-y-1">
+              <p class="text-[11px] text-gray-400">โอนเข้าบัญชีธนาคารกสิกรไทย (KBANK)</p>
+              <p class="text-base font-black text-emerald-400 tracking-widest neon-text">131-1-35888-6</p>
+              <p class="text-xs font-semibold text-gray-200">ชื่อบัญชี: น.ส.อินทิรา วรรณสา</p>
+            </div>
+
+            <label class="flex items-center gap-2.5 border border-emerald-500/30 bg-black p-3 rounded-xl cursor-pointer">
+              <input type="radio" name="payment" value="เก็บเงินปลายทาง (COD)" onclick="toggleBank(false)" class="accent-emerald-500">
+              <span class="text-xs font-medium">เก็บเงินปลายทาง (COD)</span>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- สรุปยอด -->
+      <div class="border-t border-zinc-900 pt-4 bg-zinc-950 space-y-2">
+        <div class="flex justify-between text-xs text-gray-400">
+          <span>ค่าอาหารรวม:</span>
+          <span id="food-total" class="text-gray-200">0 ฿</span>
+        </div>
+        <div class="flex justify-between text-xs text-gray-400">
+          <span>ค่าจัดส่ง:</span>
+          <span id="shipping-fee" class="text-emerald-400 font-semibold">+0 ฿</span>
+        </div>
+        <div class="flex justify-between text-base font-bold pt-2 border-t border-zinc-900 text-white">
+          <span>ยอดชำระรวมสุทธิ:</span>
+          <span id="modal-total" class="text-emerald-400 text-lg neon-text">0 ฿</span>
+        </div>
+        <button onclick="sendToLine()" class="w-full bg-emerald-500 hover:bg-emerald-400 text-black py-3 rounded-xl font-bold text-sm text-center block shadow-lg shadow-emerald-500/40 transition active:scale-95 mt-2">
+          ยืนยันสั่งซื้อส่งเข้า LINE 🟢
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Admin Control Center Modal -->
+  <div id="admin-modal" class="hidden fixed inset-0 bg-black/90 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-zinc-950 border border-emerald-500/40 w-full max-w-md rounded-3xl p-5 text-gray-100 shadow-2xl neon-glow space-y-4 max-h-[90vh] overflow-y-auto">
+      <div class="flex justify-between items-center border-b border-zinc-900 pb-3">
+        <h3 class="text-sm font-bold text-emerald-400">⚙️ ระบบจัดการหลังบ้าน (แอดมิน)</h3>
+        <button onclick="closeAdminModal()" class="text-gray-400 hover:text-white font-bold">✕</button>
+      </div>
+      
+      <!-- สถานะเปิด-ปิดร้านค้า -->
+      <div class="space-y-2">
+        <p class="text-xs font-bold text-emerald-400">🏪 จัดการ เปิด-ปิด ร้านค้า</p>
+        <div class="grid grid-cols-2 gap-2 text-xs">
+          <div class="bg-black p-3 rounded-xl border border-zinc-800 space-y-2 text-center">
+            <p class="font-bold text-white">หม่าล่าพี่เรนนี่</p>
+            <button id="btn-toggle-shop1" onclick="toggleShopStatus('shop1')" class="w-full py-1.5 rounded-lg font-bold bg-emerald-500 text-black">เปิดร้าน</button>
+          </div>
+          <div class="bg-black p-3 rounded-xl border border-zinc-800 space-y-2 text-center">
+            <p class="font-bold text-white">เจ๊อ้อยขาใหญ่</p>
+            <button id="btn-toggle-shop2" onclick="toggleShopStatus('shop2')" class="w-full py-1.5 rounded-lg font-bold bg-emerald-500 text-black">เปิดร้าน</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- จัดการสต็อกแยกตามร้าน -->
+      <div class="space-y-3 border-t border-zinc-900 pt-3">
+        <p class="text-xs font-bold text-emerald-400">📦 จัดการสต็อกสินค้าแยกตามร้าน</p>
+        
+        <!-- สต็อกร้านที่ 1 -->
+        <div class="bg-black p-3 rounded-xl border border-zinc-800 space-y-2 text-xs">
+          <p class="font-bold text-emerald-300">🔥 หม่าล่าพี่เรนนี่ สาขา ม.นคร</p>
+          <div class="space-y-1.5">
+            <label class="flex justify-between items-center bg-zinc-900/60 p-2 rounded-lg cursor-pointer">
+              <span>🐷 หมูสามชั้น</span>
+              <input type="checkbox" checked id="chk-item1" onchange="toggleItemStock('item1')" class="accent-emerald-500 w-4 h-4">
+            </label>
+            <label class="flex justify-between items-center bg-zinc-900/60 p-2 rounded-lg cursor-pointer">
+              <span>🐟 ปลาดอลลี่</span>
+              <input type="checkbox" checked id="chk-item2" onchange="toggleItemStock('item2')" class="accent-emerald-500 w-4 h-4">
+            </label>
+            <label class="flex justify-between items-center bg-zinc-900/60 p-2 rounded-lg cursor-pointer">
+              <span>🧀 เต้าหู้ชีส</span>
+              <input type="checkbox" checked id="chk-item3" onchange="toggleItemStock('item3')" class="accent-emerald-500 w-4 h-4">
+            </label>
+          </div>
+        </div>
+
+        <!-- สต็อกร้านที่ 2 -->
+        <div class="bg-black p-3 rounded-xl border border-zinc-800 space-y-2 text-xs">
+          <p class="font-bold text-amber-300">🍗 ร้านเจ๊อ้อยขาใหญ่</p>
+          <div class="space-y-1.5">
+            <label class="flex justify-between items-center bg-zinc-900/60 p-2 rounded-lg cursor-pointer">
+              <span>🍾 หงส์</span>
+              <input type="checkbox" checked id="chk-item4" onchange="toggleItemStock('item4')" class="accent-emerald-500 w-4 h-4">
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- สรุปยอดขาย & GP -->
+      <div class="space-y-2 border-t border-zinc-900 pt-3 text-xs">
+        <p class="font-bold text-emerald-400">📊 สรุปยอดขาย & ค่า GP วันนี้</p>
+        <div class="bg-black p-3 rounded-xl border border-zinc-800 space-y-1">
+          <p class="text-gray-300">หม่าล่าพี่เรนนี่: <span id="admin-shop1-sales" class="font-bold text-emerald-400">0 ฿</span> (GP: <span id="admin-shop1-gp" class="text-amber-400 font-bold">0 ฿</span>)</p>
+          <p class="text-gray-300">เจ๊อ้อยขาใหญ่: <span id="admin-shop2-sales" class="font-bold text-emerald-400">0 ฿</span> (GP: <span id="admin-shop2-gp" class="text-amber-400 font-bold">0 ฿</span>)</p>
+        </div>
+      </div>
+
+      <button onclick="closeAdminModal()" class="w-full bg-zinc-900 hover:bg-zinc-800 border border-emerald-500/30 text-white py-2.5 rounded-xl font-bold text-xs transition">ปิดหน้าต่าง</button>
+    </div>
+  </div>
+
+  <script>
+    let cart = [];
+    let currentUserPhone = '';
+    const ADMIN_PASSCODE = '1706';
+
+    let storeStatus = { shop1: true, shop2: true };
+    let itemStock = { item1: true, item2: true, item3: true, item4: true };
+
+    window.onload = function() {
+      let savedPhone = localStorage.getItem('current_user_phone');
+      if (savedPhone) {
+        currentUserPhone = savedPhone;
+        document.getElementById('user-display-phone').innerText = currentUserPhone;
+        document.getElementById('cust-phone').value = currentUserPhone;
+        document.getElementById('login-modal').classList.add('hidden');
+        loadUserData(currentUserPhone);
+      }
+    };
+
+    function handleLogin() {
+      const phoneInput = document.getElementById('login-phone').value.trim();
+      if (phoneInput.length < 9) {
+        alert('กรุณากรอกเบอร์โทรศัพท์ให้ถูกต้องครับ');
+        return;
+      }
+      currentUserPhone = phoneInput;
+      localStorage.setItem('current_user_phone', currentUserPhone);
+      document.getElementById('user-display-phone').innerText = currentUserPhone;
+      document.getElementById('cust-phone').value = currentUserPhone;
+      document.getElementById('login-modal').classList.add('hidden');
+      loadUserData(currentUserPhone);
+    }
+
+    function loadUserData(phone) {
+      let savedData = localStorage.getItem('cust_' + phone);
+      if (savedData) {
+        let data = JSON.parse(savedData);
+        document.getElementById('cust-name').value = data.name || '';
+        document.getElementById('cust-address').value = data.address || '';
+      }
+    }
+
+    function switchShop(shopId) {
+      document.querySelectorAll('.shop-section').forEach(el => el.classList.add('hidden'));
+      document.querySelectorAll('.shop-tab').forEach(el => {
+        el.className = 'shop-tab bg-zinc-900 text-gray-400 border border-zinc-800 px-4 py-2 rounded-full text-xs font-bold whitespace-nowrap transition';
+      });
+
+      document.getElementById(shopId + '-section').classList.remove('hidden');
+      document.getElementById('btn-' + shopId).className = 'shop-tab bg-emerald-500 text-black px-4 py-2 rounded-full text-xs font-bold whitespace-nowrap shadow-md transition';
+    }
+
+    function adjustDirectItem(shopName, itemName, basePrice, type, delta, itemKey) {
+      if (!currentUserPhone) {
+        document.getElementById('login-modal').classList.remove('hidden');
+        return;
+      }
+
+      if ((shopName.includes('พี่เรนนี่') && !storeStatus.shop1) || (shopName.includes('เจ๊อ้อย') && !storeStatus.shop2)) {
+        alert('ขออภัยครับ ขณะนี้ร้านค้าปิดรับออเดอร์ชั่วคราว');
+        return;
+      }
+
+      if (delta > 0 && itemStock[itemKey] === false) {
+        alert('ขออภัยครับ สินค้านี้หมดชั่วคราว');
+        return;
+      }
+
+      let existing = cart.find(item => item.shop === shopName && item.name === itemName && item.type === type);
+      if (existing) {
+        existing.qty += delta;
+        if (existing.qty <= 0) {
+          cart = cart.filter(item => item !== existing);
+        }
+      } else if (delta > 0) {
+        cart.push({
+          shop: shopName,
+          name: itemName,
+          basePrice: basePrice,
+          qty: 1,
+          type: type
+        });
+      }
+
+      updateCountersAndCart();
+    }
+
+    function updateCountersAndCart() {
+      let countMap = {
+        'หมูสามชั้น_แบบทอด': 'qty_p1_fry',
+        'หมูสามชั้น_ชาบู-น้ำดำ': 'qty_p1_black',
+        'หมูสามชั้น_ชาบู-น้ำหม่าล่า': 'qty_p1_mala',
+        'ปลาดอลลี่_แบบทอด': 'qty_p2_fry',
+        'ปลาดอลลี่_ชาบู-น้ำดำ': 'qty_p2_black',
+        'ปลาดอลลี่_ชาบู-น้ำหม่าล่า': 'qty_p2_mala',
+        'เต้าหู้ชีส_แบบทอด': 'qty_p3_fry',
+        'เต้าหู้ชีส_ชาบู-น้ำดำ': 'qty_p3_black',
+        'เต้าหู้ชีส_ชาบู-น้ำหม่าล่า': 'qty_p3_mala',
+        'หงส์_ปกติ': 'qty_p4_normal'
+      };
+
+      for (let key in countMap) {
+        let [name, type] = key.split('_');
+        let el = document.getElementById(countMap[key]);
+        if (el) {
+          let found = cart.find(i => i.name === name && i.type === type);
+          el.innerText = found ? found.qty : 0;
+        }
+      }
+
+      updateCartUI();
+    }
+
+    function updateCartUI() {
+      let totalQty = 0;
+      let foodTotal = 0;
+      let container = document.getElementById('cart-items');
+      container.innerHTML = '';
+
+      cart.forEach((item, index) => {
+        let itemPrice = item.type === 'แบบทอด' ? item.basePrice + 2 : item.basePrice;
+        foodTotal += itemPrice * item.qty;
+        totalQty += item.qty;
+
+        let div = document.createElement('div');
+        div.className = 'bg-black border border-emerald-500/30 p-3 rounded-2xl flex justify-between items-center';
+        div.innerHTML = `
+          <div>
+            <p class="font-bold text-xs text-white">[${item.shop}] ${item.name} (${item.type})</p>
+            <p class="text-[11px] text-emerald-400 font-semibold">${itemPrice} ฿ x ${item.qty} = ${itemPrice * item.qty} ฿</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <button onclick="changeCartQty(${index}, -1)" class="w-6 h-6 bg-zinc-800 text-white rounded-md font-bold text-xs">-</button>
+            <span class="text-xs font-bold text-emerald-400">${item.qty}</span>
+            <button onclick="changeCartQty(${index}, 1)" class="w-6 h-6 bg-emerald-500 text-black rounded-md font-bold text-xs">+</button>
+          </div>
+        `;
+        container.appendChild(div);
+      });
+
+      const zoneSelect = document.getElementById('shipping-zone');
+      let shipFee = zoneSelect ? parseInt(zoneSelect.value.split('|')[0]) || 0 : 12;
+      let grandTotal = foodTotal + shipFee;
+
+      const bottomBar = document.getElementById('bottom-bar');
+      document.getElementById('cart-count').innerText = totalQty;
+
+      if (totalQty > 0) {
+        bottomBar.classList.remove('hidden');
+        document.getElementById('total-price').innerText = foodTotal + ' ฿';
+        document.getElementById('food-total').innerText = foodTotal + ' ฿';
+        document.getElementById('shipping-fee').innerText = '+' + shipFee + ' ฿';
+        document.getElementById('modal-total').innerText = grandTotal + ' ฿';
+      } else {
+        bottomBar.classList.add('hidden');
+        closeCart();
+      }
+    }
+
+    function changeCartQty(index, delta) {
+      cart[index].qty += delta;
+      if (cart[index].qty <= 0) {
+        cart.splice(index, 1);
+      }
+      updateCountersAndCart();
+    }
+
+    function openCart() {
+      if (cart.length === 0) {
+        alert('กรุณาเลือกรายการอาหารก่อนครับ');
+        return;
+      }
+      document.getElementById('cart-modal').classList.remove('hidden');
+      updateCartUI();
+    }
+
+    function closeCart() {
+      document.getElementById('cart-modal').classList.add('hidden');
+    }
+
+    function toggleBank(show) {
+      const bankSection = document.getElementById('bank-section');
+      if (show) bankSection.classList.remove('hidden');
+      else bankSection.classList.add('hidden');
+    }
+
+    function recordDailySales(shopName, amount) {
+      let today = new Date().toISOString().slice(0, 10);
+      let salesKey = 'sales_' + today;
+      let allSales = JSON.parse(localStorage.getItem(salesKey) || '{}');
+      allSales[shopName] = (allSales[shopName] || 0) + amount;
+      localStorage.setItem(salesKey, JSON.stringify(allSales));
+    }
+
+    function promptAdminPassword() {
+      let pass = prompt('กรุณากรอกรหัสลับแอดมินเพื่อเข้าสู่ระบบหลังบ้าน:');
+      if (pass === ADMIN_PASSCODE) {
+        openAdminModal();
+      } else if (pass !== null) {
+        alert('รหัสผ่านไม่ถูกต้อง!');
+      }
+    }
+
+    function openAdminModal() {
+      let today = new Date().toISOString().slice(0, 10);
+      let allSales = JSON.parse(localStorage.getItem('sales_' + today) || '{}');
+      
+      let shop1Sales = allSales['หม่าล่าพี่เรนนี่ สาขา ม.นคร'] || 0;
+      let shop1GP = shop1Sales >= 500 ? 29 : 0;
+      
+      let shop2Sales = allSales['ร้านเจ๊อ้อยขาใหญ่'] || 0;
+      let shop2GP = shop2Sales >= 500 ? 29 : 0;
+
+      document.getElementById('admin-shop1-sales').innerText = shop1Sales + ' ฿';
+      document.getElementById('admin-shop1-gp').innerText = shop1GP + ' ฿';
+      document.getElementById('admin-shop2-sales').innerText = shop2Sales + ' ฿';
+      document.getElementById('admin-shop2-gp').innerText = shop2GP + ' ฿';
+
+      document.getElementById('admin-modal').classList.remove('hidden');
+    }
+
+    function closeAdminModal() {
+      document.getElementById('admin-modal').classList.add('hidden');
+    }
+
+    function toggleShopStatus(shopKey) {
+      storeStatus[shopKey] = !storeStatus[shopKey];
+      const btn = document.getElementById('btn-toggle-' + shopKey);
+      const badge = document.getElementById('badge-' + shopKey);
+
+      if (storeStatus[shopKey]) {
+        btn.innerText = 'เปิดร้าน';
+        btn.className = 'w-full py-1.5 rounded-lg font-bold bg-emerald-500 text-black';
+        badge.innerText = 'เปิดอยู่';
+        badge.className = 'text-[10px] bg-emerald-500 text-black px-2.5 py-0.5 rounded-full font-black';
+      } else {
+        btn.innerText = 'ปิดร้าน';
+        btn.className = 'w-full py-1.5 rounded-lg font-bold bg-red-600 text-white';
+        badge.innerText = 'ปิดร้าน';
+        badge.className = 'text-[10px] bg-red-600 text-white px-2.5 py-0.5 rounded-full font-black';
+      }
+    }
+
+    function toggleItemStock(itemKey) {
+      const chk = document.getElementById('chk-' + itemKey);
+      itemStock[itemKey] = chk.checked;
+      const outText = document.getElementById('out-' + itemKey);
+      const card = document.getElementById('card-' + itemKey);
+
+      if (chk.checked) {
+        outText.classList.add('hidden');
+        card.classList.remove('opacity-50');
+      } else {
+        outText.classList.remove('hidden');
+        card.classList.add('opacity-50');
+      }
+    }
+
+    function sendToLine() {
+      const name = document.getElementById('cust-name').value.trim();
+      const address = document.getElementById('cust-address').value.trim();
+      const note = document.getElementById('note-text').value.trim();
+      const paymentMethod = document.querySelector('input[name="payment"]:checked').value;
+      
+      const zoneSelect = document.getElementById('shipping-zone').value.split('|');
+      const shipFee = parseInt(zoneSelect[0]);
+      const zoneName = zoneSelect[1];
+
+      if (!name || !address) {
+        alert('กรุณากรอกชื่อ และที่อยู่จัดส่งให้ครบถ้วนครับ');
+        return;
+      }
+
+      localStorage.setItem('cust_' + currentUserPhone, JSON.stringify({ name, address }));
+
+      let text = "🛒 *ออเดอร์สั่งอาหาร INTOUCH DELIVERY*\n";
+      text += "-------------------------\n";
+      let foodTotal = 0;
+      let i = 1;
+
+      cart.forEach(item => {
+        let itemPrice = item.type === 'แบบทอด' ? item.basePrice + 2 : item.basePrice;
+        let subtotal = itemPrice * item.qty;
+        foodTotal += subtotal;
+
+        text += `${i}. [${item.shop}] ${item.name} (${item.type}) x${item.qty} = ${subtotal} บาท\n`;
+        recordDailySales(item.shop, subtotal);
+        i++;
+      });
+
+      let grandTotal = foodTotal + shipFee;
+
+      text += "-------------------------\n";
+      text += `🍱 *ค่าอาหาร:* ${foodTotal} บาท\n`;
+      text += `🛵 *ค่าจัดส่ง (${zoneName}):* ${shipFee} บาท\n`;
+      text += `💰 *ยอดชำระสุทธิ: ${grandTotal} บาท*\n\n`;
+      
+      text += "📍 *ข้อมูลการจัดส่ง*\n";
+      text += `👤 *ชื่อ:* ${name}\n`;
+      text += `📞 *เบอร์โทร:* ${currentUserPhone}\n`;
+      text += `🏠 *ที่อยู่:* ${address}\n`;
+      if (note) text += `📝 *หมายเหตุ:* ${note}\n`;
+      text += `💳 *ชำระเงิน:* ${paymentMethod} (โอนกสิกรไทย 131-1-35888-6 น.ส.อินทิรา)\n`;
+
+      window.location.href = `https://line.me/R/msg/text/?${encodeURIComponent(text)}`;
+      
+      cart = [];
+      updateCountersAndCart();
+      closeCart();
+    }
+  </script>
+</body>
+</html>
