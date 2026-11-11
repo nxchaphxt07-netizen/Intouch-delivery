@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Intouch Delivery - เดลิเวอรีส่งตรงถึงบ้าน</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+  </style>
+</head>
+<body class="bg-zinc-950 text-gray-100 pb-28">
+
+  <!-- Modal บังคับกรอกเบอร์โทรศัพท์ก่อนเข้าใช้งาน -->
+  <div id="login-modal" class="fixed inset-0 bg-black/90 backdrop-blur-md z-50 flex items-center justify-center p-4">
+    <div class="bg-zinc-900 border border-emerald-500/40 w-full max-w-sm rounded-3xl p-6 text-center shadow-2xl space-y-4">
+      <div class="w-16 h-16 bg-emerald-600/20 border border-emerald-500 text-emerald-400 rounded-full flex items-center justify-center mx-auto text-2xl font-black">ID</div>
+      <div>
+        <h2 class="text-lg font-bold text-emerald-400">INTOUCH DELIVERY</h2>
+        <p class="text-xs text-gray-400 mt-1">กรุณากรอกเบอร์โทรศัพท์มือถือเพื่อเริ่มใช้งานและบันทึกที่อยู่จัดส่งครับ</p>
+      </div>
+      <div class="space-y-3 text-left">
+        <div>
+          <label class="text-xs font-semibold text-gray-300 block mb-1">เบอร์โทรศัพท์มือถือ *</label>
+          <input id="login-phone" type="tel" placeholder="08X-XXX-XXXX" class="w-full bg-zinc-800 border border-zinc-700 rounded-xl p-3 text-sm text-white focus:border-emerald-500 outline-none text-center font-bold tracking-wider">
+        </div>
+      </div>
+      <button onclick="handleLogin()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white py-3 rounded-xl font-bold text-sm shadow-lg transition">
+        เข้าสู่ระบบ / เริ่มสั่งอาหาร 🚀
+      </button>
+    </div>
+  </div>
+
+  <!-- Header -->
+  <header class="bg-zinc-900 border-b border-emerald-500/30 text-white p-3 sticky top-0 z-20 shadow-lg flex justify-between items-center">
+    <div class="flex items-center gap-2">
+      <div class="w-9 h-9 bg-emerald-600 rounded-full flex items-center justify-center font-extrabold text-white text-base shadow-md">ID</div>
+      <div>
+        <h1 class="text-base font-extrabold text-emerald-400 tracking-wide leading-tight">INTOUCH DELIVERY</h1>
+        <p class="text-[10px] text-gray-400">👤 ผู้ใช้งาน: <span id="user-display-phone" class="text-emerald-300 font-semibold">-</span></p>
+      </div>
+    </div>
+    <div class="flex items-center gap-2">
+      <button onclick="promptAdminPassword()" class="bg-zinc-800 border border-emerald-500/40 text-emerald-400 px-2.5 py-1.5 rounded-full text-xs font-bold shadow-sm">
+        📊 สรุปยอด GP (แอดมิน)
+      </button>
+      <button onclick="openCart()" class="relative bg-emerald-600 hover:bg-emerald-500 px-3 py-1.5 rounded-full text-xs font-bold flex items-center gap-1 text-white shadow-md">
+        🛒 ตะกร้า <span id="cart-badge" class="bg-red-500 text-white text-[10px] px-1.5 py-0.5 rounded-full hidden">0</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Shop Selector Tabs -->
+  <div class="flex gap-2 p-3 bg-zinc-900/90 border-b border-zinc-800 overflow-x-auto sticky top-16 z-10 shadow-md backdrop-blur">
+    <button onclick="switchShop('shop1')" id="btn-shop1" class="shop-tab bg-emerald-600 text-white px-4 py-2 rounded-full text-sm font-bold whitespace-nowrap flex items-center gap-2 shadow-sm">
+      🔥 หม่าล่าพี่เรนนี่ (สาขา ม.นคร)
+    </button>
+  </div>
+
+  <!-- Menu Container (เลือกรายการอาหารแบบง่ายๆ ก่อน) -->
+  <main class="p-4 max-w-xl mx-auto space-y-4">
+    <div id="shop1-menu" class="shop-section space-y-3">
+      <div class="bg-zinc-900 border border-zinc-800 rounded-2xl p-4 shadow-lg">
+        <div class="bg-emerald-950/60 border border-emerald-500/30 p-3 rounded-xl mb-3 text-center">
+          <h2 class="text-base font-bold text-emerald-400">🔥 หม่าล่าพี่เรนนี่ สาขา ม.นคร</h2>
+          <p class="text-xs text-gray-400">ชาบู & หม่าล่าทอด รสชาติเข้มจัดจ้าน</p>
+        </div>
+
+        <div class="space-y-3">
+          <!-- เมนู 1: หมูสามชั้น -->
+          <div class="bg-zinc-800/80 border border-zinc-700/60 p-3 rounded-xl flex justify-between items-center">
+            <div>
+              <h3 class="font-bold text-gray-200">หมูสามชั้น</h3>
+              <p class="text-emerald-400 font-bold text-sm">20 บาท</p>
+            </div>
+            <button onclick="addItem('หม่าล่าพี่เรนนี่ สาขา ม.นคร', 'หมูสามชั้น', 20)" class="bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2 rounded-xl text-sm font-semibold transition shadow">เพิ่มลงตะกร้า ➕</button>
+          </div>
+
+          <!-- เมนู 2: ปลาดอลลี่ -->
+          <div class="bg-zinc-800/80 border border-zinc-700/60 p-3 rounded-xl flex justify-between items-center">
+            <div>
+              <h3 class="font-bold text-gray-200">ปลาดอลลี่</h3>
+              <p class="text-emerald-400 font-bold text-sm">20 บาท</p>
+            </div>
+            <button onclick="addItem('หม่าล่าพี่เรนนี่ สาขา ม.นคร', 'ปลาดอลลี่', 20)" class="bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2 rounded-xl text-sm font-semibold transition shadow">เพิ่มลงตะกร้า ➕</button>
+          </div>
+
+          <!-- เมนู 3: เต้าหู้ชีส -->
+          <div class="bg-zinc-800/80 border border-zinc-700/60 p-3 rounded-xl flex justify-between items-center">
+            <div>
+              <h3 class="font-bold text-gray-200">เต้าหู้ชีส</h3>
+              <p class="text-emerald-400 font-bold text-sm">10 บาท</p>
+            </div>
+            <button onclick="addItem('หม่าล่าพี่เรนนี่ สาขา ม.นคร', 'เต้าหู้ชีส', 10)" class="bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2 rounded-xl text-sm font-semibold transition shadow">เพิ่มลงตะกร้า ➕</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Bottom Cart Bar -->
+  <div id="bottom-bar" class="hidden fixed bottom-0 left-0 right-0 bg-zinc-900 border-t border-zinc-800 p-4 shadow-2xl flex justify-between items-center max-w-xl mx-auto z-20">
+    <div>
+      <p class="text-xs text-gray-400">ยอดรวมอาหาร</p>
+      <p id="total-price" class="text-xl font-extrabold text-emerald-400">0 ฿</p>
+    </div>
+    <button onclick="openCart()" class="bg-emerald-600 hover:bg-emerald-500 text-white px-6 py-3 rounded-xl font-bold shadow-lg transition">
+      ดูตะกร้าสินค้า & เลือกรูปแบบ 🛒
+    </button>
+  </div>
+
+  <!-- Cart Modal (หน้าเลือกรูปแบบการทำ / ซุป + ข้อมูลจัดส่ง) -->
+  <div id="cart-modal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex justify-end">
+    <div class="bg-zinc-900 border-l border-zinc-800 w-full max-w-md h-full flex flex-col justify-between p-4 overflow-y-auto text-gray-100">
+      <div>
+        <div class="flex justify-between items-center border-b border-zinc-800 pb-3 mb-4">
+          <h2 class="text-lg font-bold text-emerald-400">ตะกร้าสินค้า & เลือกรูปแบบ</h2>
+          <button onclick="closeCart()" class="text-gray-400 hover:text-white text-xl font-bold">✕</button>
+        </div>
+        
+        <!-- รายการสินค้า -->
+        <div id="cart-items" class="space-y-3 mb-4 border-b border-zinc-800 pb-3"></div>
+        
+        <!-- ข้อมูลจัดส่ง -->
+        <div class="space-y-3 mb-4">
+          <h3 class="font-bold text-sm text-emerald-400">📍 ข้อมูลผู้รับและที่อยู่จัดส่ง</h3>
+          
+          <div>
+            <label class="text-xs font-semibold text-gray-300 block mb-1">เบอร์โทรศัพท์ (ยืนยันตัวตนแล้ว) *</label>
+            <input id="cust-phone" type="tel" readonly class="w-full bg-zinc-800/70 border border-zinc-700 rounded-lg p-2.5 text-sm text-emerald-400 font-bold outline-none cursor-not-allowed">
+          </div>
+
+          <div>
+            <label class="text-xs font-semibold text-gray-300 block mb-1">เลือกโซนพื้นที่จัดส่ง *</label>
+            <select id="shipping-zone" onchange="updateCartUI()" class="w-full bg-zinc-800 border border-emerald-500/50 rounded-lg p-2.5 text-sm text-white font-semibold outline-none">
+              <option value="12|โซนบ้านเนินสะอาด / ม.นคร">🏡 โซนบ้านเนินสะอาด / ม.นคร (+12 บาท)</option>
+              <option value="20|โซนหนองญาติ">🛵 โซนหนองญาติ (+20 บาท)</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="text-xs font-semibold text-gray-300 block mb-1">ชื่อ - นามสกุล *</label>
+            <input id="cust-name" type="text" placeholder="ระบุชื่อผู้รับ" class="w-full bg-zinc-800 border border-zinc-700 rounded-lg p-2.5 text-sm text-white focus:border-emerald-500 outline-none">
+          </div>
+
+          <div>
+            <label class="text-xs font-semibold text-gray-300 block mb-1">รายละเอียดที่อยู่ (บ้านเลขที่ / ซอย / จุดสังเกต) *</label>
+            <textarea id="cust-address" rows="2" placeholder="ระบุที่อยู่จัดส่งอย่างละเอียด" class="w-full bg-zinc-800 border border-zinc-700 rounded-lg p-2.5 text-sm text-white focus:border-emerald-500 outline-none"></textarea>
+          </div>
+
+          <div>
+            <label class="text-xs font-semibold text-gray-300 block mb-1">หมายเหตุเพิ่มเติมถึงร้านค้า</label>
+            <input id="note-text" type="text" placeholder="เช่น เผ็ดน้อย, ฝากไว้ที่ป้อมยาม" class="w-full bg-zinc-800 border border-zinc-700 rounded-lg p-2.5 text-sm text-white focus:border-emerald-500 outline-none">
+          </div>
+        </div>
+
+        <!-- วิธีการชำระเงิน -->
+        <div class="space-y-2 mb-4 border-t border-zinc-800 pt-3">
+          <h3 class="font-bold text-sm text-emerald-400">💳 วิธีการชำระเงิน</h3>
+          <div class="space-y-2">
+            <label class="flex items-center gap-2 border border-zinc-700 bg-zinc-800/50 p-2.5 rounded-lg cursor-pointer">
+              <input type="radio" name="payment" value="โอนเงินผ่านบัญชีธนาคาร" checked onclick="toggleBank(true)">
+              <span class="text-sm">โอนเงินผ่านบัญชีธนาคาร</span>
+            </label>
+            
+            <div id="bank-section" class="bg-zinc-800 border border-emerald-500/30 p-3 rounded-lg text-center space-y-1">
+              <p class="text-xs text-gray-400">โอนเงินเข้าบัญชี</p>
+              <p class="text-sm font-bold text-emerald-400">ธนาคารกสิกรไทย (KBANK)</p>
+              <p class="text-base font-extrabold text-white tracking-wider">131-1-35888-6</p>
+              <p class="text-xs font-semibold text-gray-300">ชื่อบัญชี: น.ส.อินทิรา วรรณสา</p>
+              <p class="text-[10px] text-emerald-400/80 mt-1">* โอนเสร็จแล้วส่งสลิปยืนยันทาง LINE ได้เลยครับ</p>
+            </div>
+
+            <label class="flex items-center gap-2 border border-zinc-700 bg-zinc-800/50 p-2.5 rounded-lg cursor-pointer">
+              <input type="radio" name="payment" value="เก็บเงินปลายทาง (COD)" onclick="toggleBank(false)">
+              <span class="text-sm">เก็บเงินปลายทาง (COD)</span>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- สรุปยอด -->
+      <div class="border-t border-zinc-800 pt-3 mt-2 bg-zinc-900 space-y-1">
+        <div class="flex justify-between text-xs text-gray-400">
+          <span>ค่าอาหารรวม:</span>
+          <span id="food-total">0 ฿</span>
+        </div>
+        <div class="flex justify-between text-xs text-gray-400">
+          <span>ค่าจัดส่ง:</span>
+          <span id="shipping-fee" class="text-emerald-400 font-semibold">+0 ฿</span>
+        </div>
+        <div class="flex justify-between text-lg font-bold pt-1 border-t border-zinc-800">
+          <span>ยอดชำระสุทธิ:</span>
+          <span id="modal-total" class="text-emerald-400">0 ฿</span>
+        </div>
+        <button onclick="sendToLine()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white py-3 rounded-xl font-bold text-center block shadow-lg transition mt-2">
+          ยืนยันสั่งซื้อและส่งข้อมูลไปทาง LINE 🟢
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Admin GP Summary Modal -->
+  <div id="admin-modal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-zinc-900 border border-zinc-800 w-full max-w-md rounded-2xl p-5 text-gray-100 shadow-2xl space-y-4">
+      <div class="flex justify-between items-center border-b border-zinc-800 pb-3">
+        <h3 class="text-base font-bold text-emerald-400">📊 สรุปยอดขายรายวัน & คำนวณ GP</h3>
+        <button onclick="closeAdminModal()" class="text-gray-400 hover:text-white font-bold">✕</button>
+      </div>
+      <div class="space-y-3 text-sm">
+        <div class="bg-zinc-800/60 p-3 rounded-xl border border-zinc-700/50 space-y-1">
+          <p class="font-bold text-white">🏪 หม่าล่าพี่เรนนี่ สาขา ม.นคร</p>
+          <p class="text-gray-300">ยอดขายรวมวันนี้: <span id="admin-shop1-sales" class="font-bold text-emerald-400">0 ฿</span></p>
+          <p class="text-gray-300">ค่า GP (ยอดถึง 500฿ หัก 29฿): <span id="admin-shop1-gp" class="font-bold text-amber-400">0 ฿</span></p>
+        </div>
+        <div class="bg-emerald-950/40 border border-emerald-500/30 p-3 rounded-xl text-center">
+          <p class="text-xs text-emerald-300">ยอดขายรวมทั้งหมดวันนี้</p>
+          <p id="admin-total-sales" class="text-xl font-extrabold text-emerald-400">0 ฿</p>
+        </div>
+      </div>
+      <button onclick="closeAdminModal()" class="w-full bg-zinc-800 hover:bg-zinc-700 text-white py-2.5 rounded-xl font-bold transition">ปิดหน้าต่าง</button>
+    </div>
+  </div>
+
+  <script>
+    let cart = [];
+    let currentUserPhone = '';
+    const ADMIN_PASSCODE = '1706';
+
+    window.onload = function() {
+      let savedPhone = localStorage.getItem('current_user_phone');
+      if (savedPhone) {
+        currentUserPhone = savedPhone;
+        document.getElementById('user-display-phone').innerText = currentUserPhone;
+        document.getElementById('cust-phone').value = currentUserPhone;
+        document.getElementById('login-modal').classList.add('hidden');
+        loadUserData(currentUserPhone);
+      }
+    };
+
+    function handleLogin() {
+      const phoneInput = document.getElementById('login-phone').value.trim();
+      if (phoneInput.length < 9) {
+        alert('กรุณากรอกเบอร์โทรศัพท์ให้ถูกต้องครับ');
+        return;
+      }
+      currentUserPhone = phoneInput;
+      localStorage.setItem('current_user_phone', currentUserPhone);
+      document.getElementById('user-display-phone').innerText = currentUserPhone;
+      document.getElementById('cust-phone').value = currentUserPhone;
+      document.getElementById('login-modal').classList.add('hidden');
+      loadUserData(currentUserPhone);
+    }
+
+    function loadUserData(phone) {
+      let savedData = localStorage.getItem('cust_' + phone);
+      if (savedData) {
+        let data = JSON.parse(savedData);
+        document.getElementById('cust-name').value = data.name || '';
+        document.getElementById('cust-address').value = data.address || '';
+      }
+    }
+
+    function switchShop(shopId) {
+      document.querySelectorAll('.shop-section').forEach(el => el.classList.add('hidden'));
+      document.querySelectorAll('.shop-tab').forEach(el => {
+        el.className = 'shop-tab bg-zinc-800 text-gray-300 px-4 py-2 rounded-full text-sm font-bold whitespace-nowrap flex items-center gap-2';
+      });
+      document.getElementById(shopId + '-menu').classList.remove('hidden');
+      document.getElementById('btn-' + shopId).className = 'shop-tab bg-emerald-600 text-white px-4 py-2 rounded-full text-sm font-bold whitespace-nowrap flex items-center gap-2 shadow-sm';
+    }
+
+    function addItem(shopName, itemName, basePrice) {
+      if (!currentUserPhone) {
+        document.getElementById('login-modal').classList.remove('hidden');
+        return;
+      }
+
+      // เพิ่มลงตะกร้าแบบยังไม่ระบุรูปแบบ (ให้ไปเลือกในตะกร้า)
+      cart.push({
+        shop: shopName,
+        name: itemName,
+        basePrice: basePrice,
+        qty: 1,
+        cookType: 'แบบทอด', // ค่าเริ่มต้น
+        soupType: 'น้ำดำ'
+      });
+
+      updateCartUI();
+      alert('เพิ่ม ' + itemName + ' ลงตะกร้าแล้วครับ!');
+    }
+
+    function updateCartUI() {
+      let totalQty = 0;
+      let foodTotal = 0;
+      let container = document.getElementById('cart-items');
+      container.innerHTML = '';
+
+      cart.forEach((item, index) => {
+        let itemPrice = item.cookType === 'แบบทอด' ? item.basePrice + 2 : item.basePrice;
+        foodTotal += itemPrice * item.qty;
+        totalQty += item.qty;
+
+        let div = document.createElement('div');
+        div.className = 'bg-zinc-800/80 border border-zinc-700/60 p-3 rounded-xl space-y-2';
+        div.innerHTML = `
+          <div class="flex justify-between items-center">
+            <span class="font-bold text-sm text-gray-200">${item.name} (${itemPrice} ฿)</span>
+            <button onclick="removeItem(${index})" class="text-red-400 text-xs font-bold">ลบ</button>
+          </div>
+          <div class="text-xs space-y-1 pt-1 border-t border-zinc-700">
+            <div class="flex gap-3 items-center">
+              <span class="text-gray-400 font-semibold">รูปแบบ:</span>
+              <label class="cursor-pointer"><input type="radio" name="cook_${index}" value="แบบทอด" ${item.cookType==='แบบทอด'?'checked':''} onclick="setCookType(${index}, 'แบบทอด')"> ทอด (+2฿)</label>
+              <label class="cursor-pointer"><input type="radio" name="cook_${index}" value="แบบชาบู" ${item.cookType==='แบบชาบู'?'checked':''} onclick="setCookType(${index}, 'แบบชาบู')"> ชาบู</label>
+            </div>
+            <div id="soup_box_${index}" class="${item.cookType==='แบบชาบู'?'':'hidden'} flex gap-3 items-center bg-zinc-900/60 p-2 rounded-lg mt-1">
+              <span class="text-emerald-400">ซุป:</span>
+              <label class="cursor-pointer"><input type="radio" name="soup_${index}" value="น้ำดำ" ${item.soupType==='น้ำดำ'?'checked':''} onclick="setSoupType(${index}, 'น้ำดำ')"> น้ำดำ</label>
+              <label class="cursor-pointer"><input type="radio" name="soup_${index}" value="น้ำหม่าล่า" ${item.soupType==='น้ำหม่าล่า'?'checked':''} onclick="setSoupType(${index}, 'น้ำหม่าล่า')"> น้ำหม่าล่า</label>
+            </div>
+          </div>
+        `;
+        container.appendChild(div);
+      });
+
+      const zoneSelect = document.getElementById('shipping-zone');
+      let shipFee = zoneSelect ? parseInt(zoneSelect.value.split('|')[0]) || 0 : 12;
+      let grandTotal = foodTotal + shipFee;
+
+      const badge = document.getElementById('cart-badge');
+      const bottomBar = document.getElementById('bottom-bar');
+
+      if (totalQty > 0) {
+        badge.innerText = totalQty;
+        badge.classList.remove('hidden');
+        bottomBar.classList.remove('hidden');
+        document.getElementById('total-price').innerText = foodTotal + ' ฿';
+        document.getElementById('food-total').innerText = foodTotal + ' ฿';
+        document.getElementById('shipping-fee').innerText = '+' + shipFee + ' ฿';
+        document.getElementById('modal-total').innerText = grandTotal + ' ฿';
+      } else {
+        badge.classList.add('hidden');
+        bottomBar.classList.add('hidden');
+        closeCart();
+      }
+    }
+
+    function setCookType(index, type) {
+      cart[index].cookType = type;
+      updateCartUI();
+    }
+
+    function setSoupType(index, soup) {
+      cart[index].soupType = soup;
+    }
+
+    function removeItem(index) {
+      cart.splice(index, 1);
+      updateCartUI();
+    }
+
+    function openCart() {
+      if (cart.length === 0) {
+        alert('กรุณาเลือกรายการอาหารก่อนครับ');
+        return;
+      }
+      document.getElementById('cart-modal').classList.remove('hidden');
+      updateCartUI();
+    }
+
+    function closeCart() {
+      document.getElementById('cart-modal').classList.add('hidden');
+    }
+
+    function toggleBank(show) {
+      const bankSection = document.getElementById('bank-section');
+      if (show) bankSection.classList.remove('hidden');
+      else bankSection.classList.add('hidden');
+    }
+
+    function recordDailySales(shopName, amount) {
+      let today = new Date().toISOString().slice(0, 10);
+      let salesKey = 'sales_' + today;
+      let allSales = JSON.parse(localStorage.getItem(salesKey) || '{}');
+      allSales[shopName] = (allSales[shopName] || 0) + amount;
+      localStorage.setItem(salesKey, JSON.stringify(allSales));
+    }
+
+    function promptAdminPassword() {
+      let pass = prompt('กรุณากรอกรหัสลับแอดมินเพื่อดูยอดขาย:');
+      if (pass === ADMIN_PASSCODE) {
+        openAdminModal();
+      } else if (pass !== null) {
+        alert('รหัสผ่านไม่ถูกต้อง!');
+      }
+    }
+
+    function openAdminModal() {
+      let today = new Date().toISOString().slice(0, 10);
+      let allSales = JSON.parse(localStorage.getItem('sales_' + today) || '{}');
+      let shop1Sales = allSales['หม่าล่าพี่เรนนี่ สาขา ม.นคร'] || 0;
+      let shop1GP = shop1Sales >= 500 ? 29 : 0;
+      let total = shop1Sales;
+
+      document.getElementById('admin-shop1-sales').innerText = shop1Sales + ' ฿';
+      document.getElementById('admin-shop1-gp').innerText = shop1GP + ' ฿ (ยอดถึง 500฿)';
+      document.getElementById('admin-total-sales').innerText = total + ' ฿';
+      document.getElementById('admin-modal').classList.remove('hidden');
+    }
+
+    function closeAdminModal() {
+      document.getElementById('admin-modal').classList.add('hidden');
+    }
+
+    function sendToLine() {
+      const name = document.getElementById('cust-name').value.trim();
+      const address = document.getElementById('cust-address').value.trim();
+      const note = document.getElementById('note-text').value.trim();
+      const paymentMethod = document.querySelector('input[name="payment"]:checked').value;
+      
+      const zoneSelect = document.getElementById('shipping-zone').value.split('|');
+      const shipFee = parseInt(zoneSelect[0]);
+      const zoneName = zoneSelect[1];
+
+      if (!name || !address) {
+        alert('กรุณากรอกชื่อ และที่อยู่จัดส่งให้ครบถ้วนครับ');
+        return;
+      }
+
+      localStorage.setItem('cust_' + currentUserPhone, JSON.stringify({ name, address }));
+
+      let text = "🛒 *ออเดอร์สั่งอาหาร INTOUCH DELIVERY*\n";
+      text += "-------------------------\n";
+      let foodTotal = 0;
+      let i = 1;
+
+      cart.forEach(item => {
+        let itemPrice = item.cookType === 'แบบทอด' ? item.basePrice + 2 : item.basePrice;
+        let subtotal = itemPrice * item.qty;
+        foodTotal += subtotal;
+
+        let detailStr = item.cookType === 'แบบทอด' ? 'แบบทอด' : `แบบชาบู (${item.soupType})`;
+        text += `${i}. [${item.shop}] ${item.name} - ${detailStr} x${item.qty} = ${subtotal} บาท\n`;
+        recordDailySales(item.shop, subtotal);
+        i++;
+      });
+
+      let grandTotal = foodTotal + shipFee;
+
+      text += "-------------------------\n";
+      text += `🍱 *ค่าอาหาร:* ${foodTotal} บาท\n`;
+      text += `🛵 *ค่าจัดส่ง (${zoneName}):* ${shipFee} บาท\n`;
+      text += `💰 *ยอดชำระสุทธิ: ${grandTotal} บาท*\n\n`;
+      
+      text += "📍 *ข้อมูลการจัดส่ง*\n";
+      text += `👤 *ชื่อ:* ${name}\n`;
+      text += `📞 *เบอร์โทร:* ${currentUserPhone}\n`;
+      text += `🏠 *ที่อยู่:* ${address}\n`;
+      if (note) text += `📝 *หมายเหตุ:* ${note}\n`;
+      text += `💳 *ชำระเงิน:* ${paymentMethod} (โอนกสิกรไทย 131-1-35888-6 น.ส.อินทิรา)\n`;
+
+      window.location.href = `https://line.me/R/msg/text/?${encodeURIComponent(text)}`;
+      
+      cart = [];
+      updateCartUI();
+      closeCart();
+    }
+  </script>
+</body>
+</html>
