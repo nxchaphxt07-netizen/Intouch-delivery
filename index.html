@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Intouch Delivery - เดลิเวอรีส่งตรงถึงบ้าน</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Kanit', -apple-system, sans-serif; }
+  </style>
+</head>
+<body class="bg-zinc-950 text-gray-100 pb-32">
+
+  <!-- Modal เข้าสู่ระบบเบอร์โทรศัพท์ -->
+  <div id="login-modal" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-4">
+    <div class="bg-zinc-900 border border-emerald-500/30 w-full max-w-sm rounded-3xl p-6 text-center shadow-2xl space-y-5">
+      <div class="w-20 h-20 bg-gradient-to-tr from-emerald-600 to-emerald-400 text-zinc-950 rounded-2xl flex items-center justify-center mx-auto text-3xl font-black shadow-lg shadow-emerald-500/20">
+        ID
+      </div>
+      <div>
+        <h2 class="text-xl font-bold text-white">INTOUCH DELIVERY</h2>
+        <p class="text-xs text-gray-400 mt-1">ยินดีต้อนรับ! กรุณากรอกเบอร์โทรเพื่อเริ่มสั่งอาหาร</p>
+      </div>
+      <div class="space-y-3 text-left">
+        <div>
+          <label class="text-xs font-semibold text-emerald-400 block mb-1.5">เบอร์โทรศัพท์มือถือ *</label>
+          <input id="login-phone" type="tel" placeholder="08X-XXX-XXXX" class="w-full bg-zinc-800/90 border border-zinc-700 rounded-xl p-3 text-base text-white focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none text-center font-bold tracking-wider transition">
+        </div>
+      </div>
+      <button onclick="handleLogin()" class="w-full bg-emerald-500 hover:bg-emerald-400 text-zinc-950 py-3 rounded-xl font-bold text-base shadow-lg shadow-emerald-500/20 transition active:scale-95">
+        เข้าสู่ระบบ / เริ่มสั่งอาหาร 🛵
+      </button>
+    </div>
+  </div>
+
+  <!-- Header แบรนด์ -->
+  <header class="bg-zinc-900/90 backdrop-blur-md border-b border-zinc-800 text-white p-3.5 sticky top-0 z-30 shadow-md flex justify-between items-center">
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 bg-emerald-500 rounded-xl flex items-center justify-center font-black text-zinc-950 text-lg shadow-md shadow-emerald-500/20">
+        ID
+      </div>
+      <div>
+        <h1 class="text-base font-extrabold text-emerald-400 tracking-wide leading-tight">INTOUCH DELIVERY</h1>
+        <p class="text-[11px] text-gray-400 flex items-center gap-1">
+          <span class="w-2 h-2 rounded-full bg-emerald-500 inline-block animate-pulse"></span>
+          ผู้ใช้: <span id="user-display-phone" class="text-gray-200 font-medium">-</span>
+        </p>
+      </div>
+    </div>
+    <div class="flex items-center gap-2">
+      <button onclick="promptAdminPassword()" class="bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 text-emerald-400 px-3 py-1.5 rounded-full text-xs font-semibold shadow-sm transition">
+        📊 GP
+      </button>
+    </div>
+  </header>
+
+  <!-- Banner บอกโซนบริการ -->
+  <div class="bg-gradient-to-r from-emerald-950/80 via-zinc-900 to-zinc-900 border-b border-emerald-500/20 p-3.5 px-4 text-xs flex justify-between items-center">
+    <div class="flex items-center gap-2 text-gray-300">
+      <span class="text-base">📍</span>
+      <span>พื้นที่จัดส่ง: <strong class="text-emerald-400">บ้านเนินสะอาด / ม.นคร / หนองญาติ</strong></span>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <main class="p-4 max-w-md mx-auto space-y-4">
+    
+    <!-- การ์ดร้านค้า -->
+    <div class="bg-zinc-900 border border-zinc-800 rounded-3xl p-4 shadow-xl space-y-4">
+      <div class="flex items-center justify-between border-b border-zinc-800 pb-3">
+        <div class="flex items-center gap-2.5">
+          <div class="w-8 h-8 bg-amber-500/10 border border-amber-500/30 rounded-full flex items-center justify-center text-amber-400 text-sm">
+            🔥
+          </div>
+          <div>
+            <h2 class="text-base font-bold text-white">หม่าล่าพี่เรนนี่ สาขา ม.นคร</h2>
+            <p class="text-[11px] text-gray-400">เผ็ดชา เข้มข้น เลือกทอดหรือชาบูได้</p>
+          </div>
+        </div>
+        <span class="text-[10px] bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2 py-0.5 rounded-full font-medium">เปิดรับออเดอร์</span>
+      </div>
+
+      <!-- รายการเมนู -->
+      <div class="space-y-3">
+        
+        <!-- เมนู 1 -->
+        <div class="bg-zinc-800/50 border border-zinc-800 hover:border-zinc-700 p-3.5 rounded-2xl flex justify-between items-center transition">
+          <div>
+            <h3 class="font-bold text-gray-100 text-sm">หมูสามชั้น</h3>
+            <p class="text-xs text-gray-400 mt-0.5">ราคาเริ่มต้น <span class="text-emerald-400 font-bold">20 ฿</span></p>
+          </div>
+          <button onclick="addItem('หม่าล่าพี่เรนนี่ สาขา ม.นคร', 'หมูสามชั้น', 20)" class="bg-emerald-500 hover:bg-emerald-400 text-zinc-950 px-4 py-2 rounded-xl text-xs font-bold shadow-md shadow-emerald-500/10 transition active:scale-95">
+            + เลือกรายการ
+          </button>
+        </div>
+
+        <!-- เมนู 2 -->
+        <div class="bg-zinc-800/50 border border-zinc-800 hover:border-zinc-700 p-3.5 rounded-2xl flex justify-between items-center transition">
+          <div>
+            <h3 class="font-bold text-gray-100 text-sm">ปลาดอลลี่</h3>
+            <p class="text-xs text-gray-400 mt-0.5">ราคาเริ่มต้น <span class="text-emerald-400 font-bold">20 ฿</span></p>
+          </div>
+          <button onclick="addItem('หม่าล่าพี่เรนนี่ สาขา ม.นคร', 'ปลาดอลลี่', 20)" class="bg-emerald-500 hover:bg-emerald-400 text-zinc-950 px-4 py-2 rounded-xl text-xs font-bold shadow-md shadow-emerald-500/10 transition active:scale-95">
+            + เลือกรายการ
+          </button>
+        </div>
+
+        <!-- เมนู 3 -->
+        <div class="bg-zinc-800/50 border border-zinc-800 hover:border-zinc-700 p-3.5 rounded-2xl flex justify-between items-center transition">
+          <div>
+            <h3 class="font-bold text-gray-100 text-sm">เต้าหู้ชีส</h3>
+            <p class="text-xs text-gray-400 mt-0.5">ราคาเริ่มต้น <span class="text-emerald-400 font-bold">10 ฿</span></p>
+          </div>
+          <button onclick="addItem('หม่าล่าพี่เรนนี่ สาขา ม.นคร', 'เต้าหู้ชีส', 10)" class="bg-emerald-500 hover:bg-emerald-400 text-zinc-950 px-4 py-2 rounded-xl text-xs font-bold shadow-md shadow-emerald-500/10 transition active:scale-95">
+            + เลือกรายการ
+          </button>
+        </div>
+
+      </div>
+    </div>
+
+  </main>
+
+  <!-- แถบสรุปตะกร้าด้านล่าง (Bottom Floating Cart Bar) -->
+  <div id="bottom-bar" class="hidden fixed bottom-4 left-4 right-4 max-w-md mx-auto z-30">
+    <div class="bg-zinc-900/95 border border-emerald-500/40 p-3.5 px-4 rounded-2xl shadow-2xl backdrop-blur-md flex justify-between items-center">
+      <div>
+        <p class="text-[11px] text-gray-400">ตะกร้าของคุณ (<span id="cart-count" class="text-emerald-400 font-bold">0</span> รายการ)</p>
+        <p id="total-price" class="text-lg font-black text-emerald-400">0 ฿</p>
+      </div>
+      <button onclick="openCart()" class="bg-emerald-500 hover:bg-emerald-400 text-zinc-950 px-5 py-2.5 rounded-xl text-xs font-bold shadow-lg shadow-emerald-500/20 transition active:scale-95 flex items-center gap-1.5">
+        ดูตะกร้าสั่งซื้อ 🛒
+      </button>
+    </div>
+  </div>
+
+  <!-- Modal ตะกร้าสินค้าและจัดส่ง -->
+  <div id="cart-modal" class="hidden fixed inset-0 bg-black/85 backdrop-blur-sm z-50 flex justify-end">
+    <div class="bg-zinc-900 border-l border-zinc-800 w-full max-w-md h-full flex flex-col justify-between p-5 overflow-y-auto text-gray-100 shadow-2xl">
+      <div>
+        <div class="flex justify-between items-center border-b border-zinc-800 pb-4 mb-4">
+          <h2 class="text-base font-bold text-white flex items-center gap-2">🛒 สรุปรายการสั่งซื้อ</h2>
+          <button onclick="closeCart()" class="text-gray-400 hover:text-white text-lg font-bold w-8 h-8 rounded-full bg-zinc-800 flex items-center justify-center">✕</button>
+        </div>
+        
+        <!-- รายการในตะกร้า + ตัวเลือกรูปแบบ -->
+        <div id="cart-items" class="space-y-3 mb-5 border-b border-zinc-800 pb-4"></div>
+        
+        <!-- ข้อมูลจัดส่ง -->
+        <div class="space-y-3.5 mb-5">
+          <h3 class="font-bold text-xs text-emerald-400 uppercase tracking-wider">📍 ข้อมูลจัดส่ง</h3>
+          
+          <div>
+            <label class="text-xs text-gray-300 block mb-1">เบอร์โทรศัพท์มือถือ</label>
+            <input id="cust-phone" type="tel" readonly class="w-full bg-zinc-800/60 border border-zinc-700/60 rounded-xl p-2.5 text-xs text-emerald-400 font-bold outline-none cursor-not-allowed">
+          </div>
+
+          <div>
+            <label class="text-xs text-gray-300 block mb-1">พื้นที่โซนจัดส่ง *</label>
+            <select id
